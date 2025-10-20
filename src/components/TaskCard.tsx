@@ -4,10 +4,12 @@ import { Badge } from "@/components/ui/badge";
 
 interface TaskCardProps {
   task: {
-    id: number;
-    title: string;
-    deadline: string;
-    dependencies: number[];
+  id: number;
+  task: string;
+  description: string;
+  start_date: string;
+  end_date: string;
+  dependencies: number[];
   };
   index: number;
 }
@@ -20,11 +22,11 @@ export const TaskCard = ({ task, index }: TaskCardProps) => {
           {index + 1}
         </div>
         <div className="flex-1 space-y-3">
-          <h3 className="text-lg font-semibold text-foreground">{task.title}</h3>
+          <h3 className="text-lg font-semibold text-foreground">{task.task}</h3>
           <div className="flex flex-wrap gap-3 text-sm text-muted-foreground">
             <div className="flex items-center gap-1.5">
               <Clock className="w-4 h-4" />
-              <span>{task.deadline}</span>
+              <span>{`${task.start_date} - ${task.end_date}`}</span>
             </div>
             {task.dependencies.length > 0 && (
               <Badge variant="secondary" className="text-xs">

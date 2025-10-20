@@ -6,74 +6,42 @@ import { Sparkles, ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 
+const API_URL = import.meta.env.VITE_API_URL;
+
 interface Task {
   id: number;
-  title: string;
-  deadline: string;
+  task: string;
+  description: string;
+  start_date: string;
+  end_date: string;
   dependencies: number[];
 }
+
+
 
 const Index = () => {
   const [tasks, setTasks] = useState<Task[] | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [goalData, setGoalData] = useState<{ goal: string; deadline?: Date; expertise: string } | null>(null);
 
-  // Mock API call - in production, this would call your backend
   const handleFormSubmit = async (data: { goal: string; deadline?: Date; expertise: string }) => {
     setIsLoading(true);
     setGoalData(data);
 
     try {
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 2000));
+      const res = await fetch(`${API_URL}/generate-plan`, {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify(data),
+      });
 
-      // Mock response based on expertise level
-      const mockTasks: Task[] = [
-        {
-          id: 1,
-          title: "Research and identify core concepts",
-          deadline: "Week 1",
-          dependencies: [],
-        },
-        {
-          id: 2,
-          title: "Set up development environment and tools",
-          deadline: "Week 1",
-          dependencies: [],
-        },
-        {
-          id: 3,
-          title: "Complete foundational tutorials",
-          deadline: "Week 2-3",
-          dependencies: [1, 2],
-        },
-        {
-          id: 4,
-          title: "Build first practice project",
-          deadline: "Week 4-5",
-          dependencies: [3],
-        },
-        {
-          id: 5,
-          title: "Learn advanced techniques and best practices",
-          deadline: "Week 6-7",
-          dependencies: [4],
-        },
-        {
-          id: 6,
-          title: "Create portfolio project",
-          deadline: "Week 8-10",
-          dependencies: [5],
-        },
-        {
-          id: 7,
-          title: "Review, refine, and document learnings",
-          deadline: "Week 11-12",
-          dependencies: [6],
-        },
-      ];
+      if (!res.ok) {
+        const text = res.text();
+        throw new Error(`Error : ${text}` || "Failed to generate plan" || `Request failed with status code : ${res.status}`);
+      }
 
-      setTasks(mockTasks);
+      const result = await res.json();
+      setTasks(result.tasks);
       toast.success("Action plan generated successfully!");
     } catch (error) {
       toast.error("Failed to generate plan. Please try again.");
